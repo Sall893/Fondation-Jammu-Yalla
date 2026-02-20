@@ -21,23 +21,24 @@ console.log(`Serveur redémarré. CWD: ${process.cwd()}, Dirname: ${__dirname}`)
 
 
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'mail.power-techservices.com',
+    host: '91.234.194.231', // IP de mail.power-techservices.com pour forcer l'IPv4
     port: parseInt(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === 'true' ? true : false,
+    secure: false, // Port 587 utilise STARTTLS
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
     },
-    // Forcer l'IPv4 car Render a des problèmes avec l'IPv6 sortant vers les serveurs mail
     connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 10000,
-    family: 4, // FORCE IPv4
+    family: 4,
     tls: {
         rejectUnauthorized: false,
+        servername: 'mail.power-techservices.com', // Requis pour le certificat SSL avec l'IP
         minVersion: 'TLSv1.2'
     }
 });
+
 
 
 
