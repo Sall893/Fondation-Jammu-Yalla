@@ -28,15 +28,17 @@ const transporter = nodemailer.createTransport({
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
     },
-    // Forcer l'IPv4 car Render a souvent des problèmes avec l'IPv6 sortant vers les serveurs mail
-    connectionTimeout: 10000, // 10 secondes
+    // Forcer l'IPv4 car Render a des problèmes avec l'IPv6 sortant vers les serveurs mail
+    connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 10000,
+    family: 4, // FORCE IPv4
     tls: {
         rejectUnauthorized: false,
         minVersion: 'TLSv1.2'
     }
 });
+
 
 
 
