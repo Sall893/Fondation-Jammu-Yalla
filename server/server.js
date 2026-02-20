@@ -9,24 +9,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Configuration CORS dynamique pour la production
-const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:5000',
-    process.env.FRONTEND_URL // Sera l'URL Vercel
-].filter(Boolean);
-
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Non autorisé par CORS'));
-        }
-    }
-}));
+// Autoriser temporairement tous les origines pour le débogage du déploiement
+app.use(cors());
 
 app.use(express.json());
+
 
 
 console.log(`Serveur redémarré. CWD: ${process.cwd()}, Dirname: ${__dirname}`);
