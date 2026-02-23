@@ -49,7 +49,7 @@ app.get('/api/projects/:id', (req, res) => {
 app.post('/api/contact', async (req, res) => {
     const { name, email, company, message, type } = req.body;
     // Resend sandbox only sends to the verified email address
-    const adminEmail = process.env.SMTP_USER || 'souleymane.sall@power-techservices.com';
+    const adminEmail = process.env.SMTP_USER || 'souleymanesall138@gmail.com';
 
     console.log(`Nouveau contact [${type}]:`, { name, email, company, message });
 
