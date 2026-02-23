@@ -110,24 +110,27 @@ app.post('/api/contact', async (req, res) => {
 // INITIALISATION DE PAYDUNYA
 const paydunya = require('paydunya');
 
-const paydunyaMode = (process.env.PAYDUNYA_MODE || 'test').toLowerCase().trim();
+const paydunyaModeEnv = (process.env.PAYDUNYA_MODE || '').toLowerCase().trim();
+const publicKey = (process.env.PAYDUNYA_PUBLIC_KEY || '').trim();
+
+// Auto-détection du mode si la variable est manquante ou mal configurée
+let paydunyaMode = 'test';
+if (paydunyaModeEnv === 'live' || publicKey.startsWith('live_')) {
+    paydunyaMode = 'live';
+}
 
 const paydunyaSetup = new paydunya.Setup({
     masterKey: (process.env.PAYDUNYA_MASTER_KEY || 'dummy_master').trim(),
     privateKey: (process.env.PAYDUNYA_PRIVATE_KEY || 'dummy_private').trim(),
-    publicKey: (process.env.PAYDUNYA_PUBLIC_KEY || 'dummy_public').trim(),
+    publicKey: publicKey || 'dummy_public',
     token: (process.env.PAYDUNYA_TOKEN || 'dummy_token').trim(),
     mode: paydunyaMode
 });
 
 console.log("=== CONFIGURATION PAYDUNYA ===");
-console.log("- Mode Détecté :", paydunyaMode.toUpperCase());
-console.log("- Master Key   :", (process.env.PAYDUNYA_MASTER_KEY || '').substring(0, 8) + '...');
-console.log("- Public Key   :", (process.env.PAYDUNYA_PUBLIC_KEY || '').substring(0, 8) + '...');
-if (paydunyaMode === 'test' && (process.env.PAYDUNYA_PUBLIC_KEY || '').startsWith('live_')) {
-    console.warn("!!! ATTENTION : Vous utilisez des clés LIVE mais le serveur est en mode TEST !!!");
-    console.warn("!!! Veuillez ajouter PAYDUNYA_MODE=live dans vos variables Render.        !!!");
-}
+console.log("- Mode Final :", paydunyaMode.toUpperCase());
+console.log("- Source Mode :", paydunyaModeEnv ? "Variable d'env" : "Auto-détection via clé");
+console.log("- Public Key :", publicKey.substring(0, 12) + '...');
 console.log("===============================");
 
 const frontendBase = process.env.FRONTEND_URL || 'http://localhost:5173';
