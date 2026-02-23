@@ -155,8 +155,18 @@ const paydunyaStore = new paydunya.Store({
     cancelURL: `${formattedFrontendUrl}/don/annulation`
 });
 
+// ROUTE : Vérification de l'état de l'API de don
+app.get('/api/donate-check', (req, res) => {
+    res.json({
+        status: 'ok',
+        mode: paydunyaMode,
+        paydunya_configured: !!process.env.PAYDUNYA_PUBLIC_KEY
+    });
+});
+
 // ROUTE : Initialiser un paiement
 app.post('/api/donate', async (req, res) => {
+    console.log("REQUÊTE DE DON REÇUE - Headers:", JSON.stringify(req.headers));
     let { amount, donorName, donorEmail } = req.body;
 
     // S'assurer que le montant est un nombre
