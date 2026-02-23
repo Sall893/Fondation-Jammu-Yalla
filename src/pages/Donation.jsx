@@ -10,6 +10,7 @@ const Donation = () => {
     const [error, setError] = useState('');
 
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    console.log("DEBUG: Appel API vers", API_BASE_URL);
 
     const handleDonate = async (e) => {
         e.preventDefault();
@@ -84,8 +85,8 @@ const Donation = () => {
                                         type="button"
                                         onClick={() => { setAmount(val); setCustomAmount(''); }}
                                         className={`py-4 px-6 rounded-xl font-bold border-2 transition-all ${amount === val && !customAmount
-                                                ? 'bg-brand-red text-white border-brand-red'
-                                                : 'bg-white text-gray-700 border-gray-200 hover:border-brand-red hover:text-brand-red'
+                                            ? 'bg-brand-red text-white border-brand-red'
+                                            : 'bg-white text-gray-700 border-gray-200 hover:border-brand-red hover:text-brand-red'
                                             }`}
                                     >
                                         {val} FCFA
