@@ -197,10 +197,20 @@ app.post('/api/donate', async (req, res) => {
             console.log("Facture PayDunya créée avec succès:", invoice.token);
             res.json({ url: invoice.url, token: invoice.token });
         } else {
-            console.error("Paydunya (Erreur creation):", invoice.responseText);
+            const errorMsg = invoice.responseText || "";
+            console.error("Paydunya (Erreur creation):", errorMsg);
+
+            // Gestion spécifique du KYC ou des erreurs de compte
+            if (errorMsg.includes("KYC")) {
+                return res.status(403).json({
+                    error: "Le compte de la fondation est en cours de validation par PayDunya (KYC).",
+                    details: "Les paiements réels seront activés dès que PayDunya aura validé les documents de la fondation."
+                });
+            }
+
             res.status(500).json({
                 error: "Impossible de générer le lien de paiement PayDunya.",
-                details: invoice.responseText,
+                details: errorMsg,
                 code: invoice.responseCode
             });
         }

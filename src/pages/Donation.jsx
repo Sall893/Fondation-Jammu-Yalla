@@ -41,9 +41,10 @@ const Donation = () => {
             const data = await response.json();
 
             if (response.ok && data.url) {
-                // Redirection vers lapage de paiement sécurisée PayDunya
+                // Redirection vers la page de paiement sécurisée PayDunya
                 window.location.href = data.url;
             } else {
+                // Si le backend renvoie un message spécifique (ex: KYC)
                 setError(data.error || "Erreur de connexion au service de paiement.");
             }
         } catch (err) {
