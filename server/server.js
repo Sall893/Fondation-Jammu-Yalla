@@ -124,13 +124,16 @@ console.log("- Public:", (process.env.PAYDUNYA_PUBLIC_KEY || '').substring(0, 5)
 console.log("- Private:", (process.env.PAYDUNYA_PRIVATE_KEY || '').substring(0, 5) + '...');
 console.log("- Mode:", process.env.PAYDUNYA_MODE || 'test');
 
+const frontendBase = process.env.FRONTEND_URL || 'http://localhost:5173';
+const formattedFrontendUrl = frontendBase.startsWith('http') ? frontendBase : `https://${frontendBase}`;
+
 const paydunyaStore = new paydunya.Store({
     name: 'Fondation Jaamu Yàlla', // only name is required
     tagline: "L'énergie de faire le bien.",
     postalAddress: 'Dakar, Sénégal',
     logoURL: 'https://fondation-jammu-yalla.vercel.app/logo-transparent.png',
-    returnURL: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/don/succes`,
-    cancelURL: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/don/annulation`
+    returnURL: `${formattedFrontendUrl}/don/succes`,
+    cancelURL: `${formattedFrontendUrl}/don/annulation`
 });
 
 // ROUTE : Initialiser un paiement
