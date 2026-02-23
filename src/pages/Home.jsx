@@ -71,7 +71,7 @@ const Home = () => {
                             <Link to="/devenir-partenaire" className="bg-brand-navy text-white px-12 py-5 rounded-2xl font-bold shadow-2xl hover:bg-brand-blue hover:-translate-y-1 transition-all">
                                 Devenir Partenaire
                             </Link>
-                            <Link to="/partenariat" className="bg-brand-red text-white px-12 py-5 rounded-2xl font-bold shadow-2xl hover:bg-opacity-90 hover:-translate-y-1 transition-all">
+                            <Link to="/don" className="bg-brand-red text-white px-12 py-5 rounded-2xl font-bold shadow-2xl hover:bg-opacity-90 hover:-translate-y-1 transition-all">
                                 Nous Soutenir
                             </Link>
                         </div>

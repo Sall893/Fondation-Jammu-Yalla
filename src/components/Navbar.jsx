@@ -59,7 +59,7 @@ const Navbar = () => {
                   {item.name}
                 </Link>
               ))}
-              <Link to="/partenariat" className="bg-brand-red text-white px-6 py-2 rounded-full font-extrabold shadow-lg transform hover:scale-105 transition-all text-sm uppercase tracking-wider">
+              <Link to="/don" className="bg-brand-red text-white px-6 py-2 rounded-full font-extrabold shadow-lg transform hover:scale-105 transition-all text-sm uppercase tracking-wider">
                 Nous Soutenir
               </Link>
             </div>
@@ -106,7 +106,7 @@ const Navbar = () => {
               ))}
               <div className="pt-6 px-4">
                 <Link
-                  to="/partenariat"
+                  to="/don"
                   className="block w-full text-center bg-brand-red text-white py-5 rounded-2xl font-black shadow-xl uppercase tracking-widest text-sm"
                   onClick={() => setIsOpen(false)}
                 >

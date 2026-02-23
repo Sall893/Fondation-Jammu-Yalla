@@ -107,7 +107,107 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
+// INITIALISATION DE PAYDUNYA
+const paydunya = require('paydunya');
 
+const paydunyaSetup = new paydunya.Setup({
+    masterKey: process.env.PAYDUNYA_MASTER_KEY || 'dummy_master',
+    privateKey: process.env.PAYDUNYA_PRIVATE_KEY || 'dummy_private',
+    publicKey: process.env.PAYDUNYA_PUBLIC_KEY || 'dummy_public',
+    token: process.env.PAYDUNYA_TOKEN || 'dummy_token',
+    mode: process.env.PAYDUNYA_MODE || 'test' // 'test' (sandbox) ou 'live' (production)
+});
+
+console.log("PAYDUNYA INIT DEBUG:");
+console.log("- Master:", (process.env.PAYDUNYA_MASTER_KEY || '').substring(0, 5) + '...');
+console.log("- Public:", (process.env.PAYDUNYA_PUBLIC_KEY || '').substring(0, 5) + '...');
+console.log("- Private:", (process.env.PAYDUNYA_PRIVATE_KEY || '').substring(0, 5) + '...');
+console.log("- Mode:", process.env.PAYDUNYA_MODE || 'test');
+
+const paydunyaStore = new paydunya.Store({
+    name: 'Fondation Jaamu Yàlla', // only name is required
+    tagline: "L'énergie de faire le bien.",
+    postalAddress: 'Dakar, Sénégal',
+    logoURL: 'https://fondation-jammu-yalla.vercel.app/logo-transparent.png',
+    returnURL: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/don/succes`,
+    cancelURL: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/don/annulation`
+});
+
+// ROUTE : Initialiser un paiement
+app.post('/api/donate', async (req, res) => {
+    const { amount, donorName, donorEmail } = req.body;
+
+    if (!amount || amount < 100) {
+        return res.status(400).json({ error: "Montant invalide. Le minimum est de 100 FCFA." });
+    }
+
+    try {
+        const invoice = new paydunya.CheckoutInvoice(paydunyaSetup, paydunyaStore);
+        invoice.addItem(`Don de soutien - ${donorName || 'Anonyme'}`, 1, amount, amount);
+        invoice.totalAmount = amount;
+        invoice.description = 'Soutien aux actions de la fondation';
+
+        if (donorEmail) {
+            invoice.addCustomData('donorEmail', donorEmail);
+        }
+
+        await invoice.create();
+
+        if (invoice.url) {
+            res.json({ url: invoice.url, token: invoice.token });
+        } else {
+            console.error("Paydunya (pas d'url):", invoice.responseText);
+            res.status(500).json({ error: "Impossible de générer le lien de paiement PayDunya. Vérifiez les clés API." });
+        }
+    } catch (err) {
+        console.error("Erreur PayDunya lors de la création de facture:", err);
+        res.status(500).json({ error: "Erreur serveur lors de la communication avec PayDunya." });
+    }
+});
+
+// ROUTE : Webhook IPN (Notification Post-Paiement par PayDunya)
+app.post('/api/paydunya-ipn', async (req, res) => {
+    try {
+        // PayDunya sends the hash inside req.body.data.hash
+        const hash = req.body.data ? req.body.data.hash : req.body.hash;
+
+        if (!hash) {
+            return res.status(400).send("Hash manquant");
+        }
+
+        const invoice = new paydunya.CheckoutInvoice(paydunyaSetup, paydunyaStore);
+        const receipt = await invoice.confirm(hash);
+
+        console.log(`\n=== NOTIFICATION PAYDUNYA REÇUE ===`);
+        console.log(`Statut du paiement : ${receipt.status}`);
+        console.log(`Montant : ${invoice.totalAmount}`);
+        console.log(`Client :`, invoice.customer);
+        console.log(`===================================\n`);
+
+        if (receipt.status === 'completed') {
+            // Le paiement a réussi
+            // TODO: Enregistrer le don dans une base de données ou envoyer email de remerciement
+
+            // On peut envoyer un e-mail à l'admin pour l'avertir
+            if (process.env.RESEND_API_KEY) {
+                const adminEmail = process.env.SMTP_USER || 'souleymanesall138@gmail.com';
+                try {
+                    await resend.emails.send({
+                        from: 'Fondation Jaamu Yàlla <onboarding@resend.dev>',
+                        to: [adminEmail],
+                        subject: `🎉 Un nouveau don de ${invoice.totalAmount} FCFA a été reçu !`,
+                        html: `<p>Bonne nouvelle ! Le paiement PayDunya a été confirmé.</p><p>Montant: <strong>${invoice.totalAmount} FCFA</strong></p>`
+                    });
+                } catch (e) { console.error("Erreur envoi notification admin:", e); }
+            }
+        }
+
+        res.status(200).send("OK");
+    } catch (err) {
+        console.error("Erreur lors du traitement de l'IPN PayDunya:", err);
+        res.status(500).send("Erreur de confirmation");
+    }
+});
 
 app.get('/', (req, res) => {
     res.send('API Fondation Jaamu Yàlla est opérationnelle.');

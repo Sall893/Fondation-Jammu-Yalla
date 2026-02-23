@@ -11,6 +11,9 @@ import ScrollToTop from './components/ScrollToTop';
 import Projects from './pages/Projects';
 import BecomePartner from './pages/BecomePartner';
 import ProgramDetail from './pages/ProgramDetail';
+import Donation from './pages/Donation';
+import DonationSuccess from './pages/DonationSuccess';
+import DonationCancel from './pages/DonationCancel';
 
 function App() {
     return (
@@ -28,6 +31,9 @@ function App() {
                     <Route path="/projets-phares" element={<Projects />} />
                     <Route path="/devenir-partenaire" element={<BecomePartner />} />
                     <Route path="/programmes/:slug" element={<ProgramDetail />} />
+                    <Route path="/don" element={<Donation />} />
+                    <Route path="/don/succes" element={<DonationSuccess />} />
+                    <Route path="/don/annulation" element={<DonationCancel />} />
                 </Routes>
 
                 <Footer />
