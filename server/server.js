@@ -135,15 +135,23 @@ const paydunyaStore = new paydunya.Store({
 
 // ROUTE : Initialiser un paiement
 app.post('/api/donate', async (req, res) => {
-    const { amount, donorName, donorEmail } = req.body;
+    let { amount, donorName, donorEmail } = req.body;
+
+    // S'assurer que le montant est un nombre
+    amount = Number(amount);
 
     if (!amount || amount < 100) {
         return res.status(400).json({ error: "Montant invalide. Le minimum est de 100 FCFA." });
     }
 
     try {
+        console.log(`Initialisation paiement PayDunya de ${amount} FCFA pour ${donorName || 'Anonyme'}`);
         const invoice = new paydunya.CheckoutInvoice(paydunyaSetup, paydunyaStore);
-        invoice.addItem(`Don de soutien - ${donorName || 'Anonyme'}`, 1, amount, amount);
+
+        // Nettoyer les entrées pour éviter des erreurs de caractères spéciaux dans le nom
+        const cleanName = (donorName || 'Anonyme').substring(0, 50);
+
+        invoice.addItem(`Don de soutien - ${cleanName}`, 1, amount, amount);
         invoice.totalAmount = amount;
         invoice.description = 'Soutien aux actions de la fondation';
 
@@ -154,14 +162,22 @@ app.post('/api/donate', async (req, res) => {
         await invoice.create();
 
         if (invoice.url) {
+            console.log("Facture PayDunya créée avec succès:", invoice.token);
             res.json({ url: invoice.url, token: invoice.token });
         } else {
-            console.error("Paydunya (pas d'url):", invoice.responseText);
-            res.status(500).json({ error: "Impossible de générer le lien de paiement PayDunya. Vérifiez les clés API." });
+            console.error("Paydunya (Erreur creation):", invoice.responseText);
+            res.status(500).json({
+                error: "Impossible de générer le lien de paiement PayDunya.",
+                details: invoice.responseText,
+                code: invoice.responseCode
+            });
         }
     } catch (err) {
-        console.error("Erreur PayDunya lors de la création de facture:", err);
-        res.status(500).json({ error: "Erreur serveur lors de la communication avec PayDunya." });
+        console.error("Erreur critique PayDunya:", err);
+        res.status(500).json({
+            error: "Erreur serveur lors de la communication avec PayDunya.",
+            systemError: err.message
+        });
     }
 });
 
