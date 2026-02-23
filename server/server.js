@@ -110,19 +110,25 @@ app.post('/api/contact', async (req, res) => {
 // INITIALISATION DE PAYDUNYA
 const paydunya = require('paydunya');
 
+const paydunyaMode = (process.env.PAYDUNYA_MODE || 'test').toLowerCase().trim();
+
 const paydunyaSetup = new paydunya.Setup({
-    masterKey: process.env.PAYDUNYA_MASTER_KEY || 'dummy_master',
-    privateKey: process.env.PAYDUNYA_PRIVATE_KEY || 'dummy_private',
-    publicKey: process.env.PAYDUNYA_PUBLIC_KEY || 'dummy_public',
-    token: process.env.PAYDUNYA_TOKEN || 'dummy_token',
-    mode: process.env.PAYDUNYA_MODE || 'test' // 'test' (sandbox) ou 'live' (production)
+    masterKey: (process.env.PAYDUNYA_MASTER_KEY || 'dummy_master').trim(),
+    privateKey: (process.env.PAYDUNYA_PRIVATE_KEY || 'dummy_private').trim(),
+    publicKey: (process.env.PAYDUNYA_PUBLIC_KEY || 'dummy_public').trim(),
+    token: (process.env.PAYDUNYA_TOKEN || 'dummy_token').trim(),
+    mode: paydunyaMode
 });
 
-console.log("PAYDUNYA INIT DEBUG:");
-console.log("- Master:", (process.env.PAYDUNYA_MASTER_KEY || '').substring(0, 5) + '...');
-console.log("- Public:", (process.env.PAYDUNYA_PUBLIC_KEY || '').substring(0, 5) + '...');
-console.log("- Private:", (process.env.PAYDUNYA_PRIVATE_KEY || '').substring(0, 5) + '...');
-console.log("- Mode:", process.env.PAYDUNYA_MODE || 'test');
+console.log("=== CONFIGURATION PAYDUNYA ===");
+console.log("- Mode Détecté :", paydunyaMode.toUpperCase());
+console.log("- Master Key   :", (process.env.PAYDUNYA_MASTER_KEY || '').substring(0, 8) + '...');
+console.log("- Public Key   :", (process.env.PAYDUNYA_PUBLIC_KEY || '').substring(0, 8) + '...');
+if (paydunyaMode === 'test' && (process.env.PAYDUNYA_PUBLIC_KEY || '').startsWith('live_')) {
+    console.warn("!!! ATTENTION : Vous utilisez des clés LIVE mais le serveur est en mode TEST !!!");
+    console.warn("!!! Veuillez ajouter PAYDUNYA_MODE=live dans vos variables Render.        !!!");
+}
+console.log("===============================");
 
 const frontendBase = process.env.FRONTEND_URL || 'http://localhost:5173';
 const formattedFrontendUrl = frontendBase.startsWith('http') ? frontendBase : `https://${frontendBase}`;
