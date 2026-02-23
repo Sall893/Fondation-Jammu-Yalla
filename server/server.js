@@ -110,34 +110,44 @@ app.post('/api/contact', async (req, res) => {
 // INITIALISATION DE PAYDUNYA
 const paydunya = require('paydunya');
 
-const paydunyaModeEnv = (process.env.PAYDUNYA_MODE || '').toLowerCase().trim();
+const paydunyaToken = (process.env.PAYDUNYA_TOKEN || '').trim();
 const publicKey = (process.env.PAYDUNYA_PUBLIC_KEY || '').trim();
+const privateKey = (process.env.PAYDUNYA_PRIVATE_KEY || '').trim();
+const masterKey = (process.env.PAYDUNYA_MASTER_KEY || '').trim();
+const paydunyaModeEnv = (process.env.PAYDUNYA_MODE || '').toLowerCase().trim();
 
-// Auto-détection du mode si la variable est manquante ou mal configurée
+// Déterminer le mode final
 let paydunyaMode = 'test';
-if (paydunyaModeEnv === 'live' || publicKey.startsWith('live_')) {
+if (paydunyaModeEnv === 'live' || publicKey.startsWith('live_') || privateKey.startsWith('live_')) {
     paydunyaMode = 'live';
 }
 
 const paydunyaSetup = new paydunya.Setup({
-    masterKey: (process.env.PAYDUNYA_MASTER_KEY || 'dummy_master').trim(),
-    privateKey: (process.env.PAYDUNYA_PRIVATE_KEY || 'dummy_private').trim(),
+    masterKey: masterKey || 'dummy_master',
+    privateKey: privateKey || 'dummy_private',
     publicKey: publicKey || 'dummy_public',
-    token: (process.env.PAYDUNYA_TOKEN || 'dummy_token').trim(),
+    token: paydunyaToken || 'dummy_token',
     mode: paydunyaMode
 });
 
-console.log("=== CONFIGURATION PAYDUNYA ===");
-console.log("- Mode Final :", paydunyaMode.toUpperCase());
-console.log("- Source Mode :", paydunyaModeEnv ? "Variable d'env" : "Auto-détection via clé");
-console.log("- Public Key :", publicKey.substring(0, 12) + '...');
+// FORCE BASE URL - Sécurité supplémentaire si le SDK est capricieux
+if (paydunyaMode === 'live') {
+    paydunyaSetup.baseURL = 'https://app.paydunya.com/api/v1';
+}
+
+console.log("=== DIAGNOSTIC PAYDUNYA LIVE ===");
+console.log("- Mode Final Enforcé :", paydunyaMode.toUpperCase());
+console.log("- Base URL utilisée :", paydunyaSetup.baseURL);
+console.log("- Master Key (début) :", masterKey.substring(0, 5) + "...");
+console.log("- Private Key (début):", privateKey.substring(0, 12) + "...");
+console.log("- Token (début)      :", paydunyaToken.substring(0, 5) + "...");
 console.log("===============================");
 
 const frontendBase = process.env.FRONTEND_URL || 'http://localhost:5173';
 const formattedFrontendUrl = frontendBase.startsWith('http') ? frontendBase : `https://${frontendBase}`;
 
 const paydunyaStore = new paydunya.Store({
-    name: 'Fondation Jaamu Yàlla', // only name is required
+    name: 'Fondation Jaamu Yàlla',
     tagline: "L'énergie de faire le bien.",
     postalAddress: 'Dakar, Sénégal',
     logoURL: 'https://fondation-jammu-yalla.vercel.app/logo-transparent.png',
