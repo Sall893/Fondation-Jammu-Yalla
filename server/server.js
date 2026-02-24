@@ -203,28 +203,33 @@ app.post('/api/donate', async (req, res) => {
             console.log("Facture PayDunya créée avec succès:", invoice.token);
             res.json({ url: invoice.url, token: invoice.token });
         } else {
-            const errorMsg = invoice.responseText || "";
-            console.error("Paydunya (Erreur creation):", errorMsg);
-
-            // Gestion spécifique du KYC ou des erreurs de compte
-            if (errorMsg.includes("KYC")) {
-                return res.status(403).json({
-                    error: "Le compte de la fondation est en cours de validation par PayDunya (KYC).",
-                    details: "Les paiements réels seront activés dès que PayDunya aura validé les documents de la fondation."
-                });
-            }
-
             res.status(500).json({
                 error: "Impossible de générer le lien de paiement PayDunya.",
-                details: errorMsg,
-                code: invoice.responseCode
             });
         }
     } catch (err) {
         console.error("Erreur critique PayDunya:", err);
+
+        let errorDetails = err.message;
+        let isKycError = false;
+
+        if (err.data && err.data.response_text) {
+            errorDetails = err.data.response_text;
+            if (errorDetails.includes("KYC")) {
+                isKycError = true;
+            }
+        }
+
+        if (isKycError) {
+            return res.status(403).json({
+                error: "Le compte de la fondation est en cours de validation par PayDunya (KYC).",
+                details: "Les paiements réels seront activés dès que PayDunya aura validé les documents de la fondation."
+            });
+        }
+
         res.status(500).json({
             error: "Erreur serveur lors de la communication avec PayDunya.",
-            systemError: err.message
+            systemError: errorDetails
         });
     }
 });
