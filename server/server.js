@@ -14,6 +14,12 @@ app.use(cors());
 
 app.use(express.json());
 
+// Logger global pour toutes les requêtes
+app.use((req, res, next) => {
+    console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.url}`);
+    next();
+});
+
 console.log(`Serveur redémarré. CWD: ${process.cwd()}, Dirname: ${__dirname}`);
 
 // Initialisation de Resend avec la clé API
@@ -166,7 +172,7 @@ app.get('/api/donate-check', (req, res) => {
 
 // ROUTE : Initialiser un paiement
 app.post('/api/donate', async (req, res) => {
-    console.log("REQUÊTE DE DON REÇUE - Headers:", JSON.stringify(req.headers));
+    console.log("-> Requête de don reçue...");
     let { amount, donorName, donorEmail } = req.body;
 
     // S'assurer que le montant est un nombre
