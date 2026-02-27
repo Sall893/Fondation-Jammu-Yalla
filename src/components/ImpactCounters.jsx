@@ -2,9 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const stats = [
-    { label: "Familles Aidées", value: 500, suffix: "+", color: "text-brand-blue" },
-    { label: "Centres Audités", value: 35, suffix: "", color: "text-brand-red" },
-    { label: "Kits Solaires", value: "1.2k", suffix: "", color: "text-brand-yellow" },
+    { label: "Familles Cibles", value: 1000, suffix: "", color: "text-brand-blue" },
+    { label: "Audits de Sécurité", value: 5, suffix: "", color: "text-brand-red" },
+    { label: "Kits Solaires Prévus", value: 200, suffix: "+", color: "text-brand-yellow" },
 ];
 
 

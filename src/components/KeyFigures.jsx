@@ -35,9 +35,9 @@ const KeyFigures = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <StatCard number="25" label="Projets Structurants Financés" delay={0.1} />
-                    <StatCard number="12" label="Zones d'Intervention au Sénégal" delay={0.2} />
-                    <StatCard number="5000" label="Bénéficiaires Directs" delay={0.3} />
+                    <StatCard number="3" label="Projets Pilotes en Lancement" delay={0.1} />
+                    <StatCard number="2" label="Zones Prioritaires (Dakar & Thiès)" delay={0.2} />
+                    <StatCard number="1000" label="Familles Ciblées en 2026" delay={0.3} />
                 </div>
             </div>
         </section>

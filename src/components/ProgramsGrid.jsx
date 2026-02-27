@@ -7,7 +7,7 @@ const programs = [
         title: "Petits Anges",
         slug: "petits-anges",
         subtitle: "Protection de l'Enfance",
-        description: "Pouponnières & Enfance. Accompagnement constant des centres pour enfants en difficulté et handicapés.",
+        description: "Programme de soutien aux pouponnières. Nous initions un accompagnement constant des centres pour enfants en difficulté et handicapés.",
         icon: (
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -20,7 +20,7 @@ const programs = [
         title: "Sérénité Énergétique",
         slug: "serenite-energetique",
         subtitle: "Audit & Sécurité",
-        description: "Audits électriques et installations solaires pour assurer la sécurité et la continuité des soins et de l'éducation.",
+        description: "Audits électriques pilotes et solutions solaires pour assurer la sécurité et la continuité des soins et de l'éducation en milieu rural.",
         icon: (
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -32,8 +32,8 @@ const programs = [
     {
         title: "Pôle Bayakh",
         slug: "pole-bayakh",
-        subtitle: "Centre d'Excellence",
-        description: "Projet phare de 3000 m² : transformation agricole et technologique pour l'autonomisation durable du Sénégal.",
+        subtitle: "Projet Phare",
+        description: "Projet majeur de 3000 m² en lancement : transformation agricole et technologique pour l'autonomisation durable du Sénégal.",
         icon: (
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
