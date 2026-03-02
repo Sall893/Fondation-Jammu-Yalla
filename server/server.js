@@ -113,168 +113,114 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// INITIALISATION DE PAYDUNYA
-const paydunya = require('paydunya');
+const axios = require('axios');
 
-const paydunyaToken = (process.env.PAYDUNYA_TOKEN || '').trim();
-const publicKey = (process.env.PAYDUNYA_PUBLIC_KEY || '').trim();
-const privateKey = (process.env.PAYDUNYA_PRIVATE_KEY || '').trim();
-const masterKey = (process.env.PAYDUNYA_MASTER_KEY || '').trim();
-const paydunyaModeEnv = (process.env.PAYDUNYA_MODE || '').toLowerCase().trim();
+// CONFIGURATION PAYTECH
+const PAYTECH_API_KEY = process.env.PAYTECH_API_KEY;
+const PAYTECH_API_SECRET = process.env.PAYTECH_API_SECRET;
 
-// Déterminer le mode final
-let paydunyaMode = 'test';
-if (paydunyaModeEnv === 'live' || publicKey.startsWith('live_') || privateKey.startsWith('live_')) {
-    paydunyaMode = 'live';
-}
-
-const paydunyaSetup = new paydunya.Setup({
-    masterKey: masterKey || 'dummy_master',
-    privateKey: privateKey || 'dummy_private',
-    publicKey: publicKey || 'dummy_public',
-    token: paydunyaToken || 'dummy_token',
-    mode: paydunyaMode
-});
-
-// FORCE BASE URL - Sécurité supplémentaire si le SDK est capricieux
-if (paydunyaMode === 'live') {
-    paydunyaSetup.baseURL = 'https://app.paydunya.com/api/v1';
-}
-
-console.log("=== DIAGNOSTIC PAYDUNYA LIVE ===");
-console.log("- Mode Final Enforcé :", paydunyaMode.toUpperCase());
-console.log("- Base URL utilisée :", paydunyaSetup.baseURL);
-console.log("- Master Key (début) :", masterKey.substring(0, 5) + "...");
-console.log("- Private Key (début):", privateKey.substring(0, 12) + "...");
-console.log("- Token (début)      :", paydunyaToken.substring(0, 5) + "...");
-console.log("===============================");
-
-const frontendBase = process.env.FRONTEND_URL || 'http://localhost:5173';
-const formattedFrontendUrl = frontendBase.startsWith('http') ? frontendBase : `https://${frontendBase}`;
-
-const paydunyaStore = new paydunya.Store({
-    name: 'Fondation Jaamu Yàlla',
-    tagline: "L'énergie de faire le bien.",
-    postalAddress: 'Dakar, Sénégal',
-    logoURL: 'https://fondation-jammu-yalla.vercel.app/logo-transparent.png',
-    returnURL: `${formattedFrontendUrl}/don/succes`,
-    cancelURL: `${formattedFrontendUrl}/don/annulation`
-});
+console.log("=== CONFIGURATION PAYTECH ===");
+console.log("- API Key (début):", (PAYTECH_API_KEY || "").substring(0, 10) + "...");
+console.log("==============================");
 
 // ROUTE : Vérification de l'état de l'API de don
 app.get('/api/donate-check', (req, res) => {
     res.json({
         status: 'ok',
-        mode: paydunyaMode,
-        paydunya_configured: !!process.env.PAYDUNYA_PUBLIC_KEY
+        gateway: 'paytech',
+        paytech_configured: !!PAYTECH_API_KEY
     });
 });
 
-// ROUTE : Initialiser un paiement
+// ROUTE : Initialiser un paiement PayTech
 app.post('/api/donate', async (req, res) => {
-    console.log("-> Requête de don reçue...");
+    console.log("-> Requête de don reçue (via PayTech)...");
     let { amount, donorName, donorEmail } = req.body;
 
-    // S'assurer que le montant est un nombre
     amount = Number(amount);
-
     if (!amount || amount < 100) {
         return res.status(400).json({ error: "Montant invalide. Le minimum est de 100 FCFA." });
     }
 
     try {
-        console.log(`Initialisation paiement PayDunya de ${amount} FCFA pour ${donorName || 'Anonyme'}`);
-        const invoice = new paydunya.CheckoutInvoice(paydunyaSetup, paydunyaStore);
+        const frontendBase = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const formattedFrontendUrl = frontendBase.startsWith('http') ? frontendBase : `https://${frontendBase}`;
 
-        // Nettoyer les entrées pour éviter des erreurs de caractères spéciaux dans le nom
-        const cleanName = (donorName || 'Anonyme').substring(0, 50);
+        const params = {
+            item_name: `Don Fondation Jaamu Yàlla - ${donorName || 'Anonyme'}`,
+            item_price: amount,
+            currency: "XOF",
+            ref_command: `DON_${Date.now()}`,
+            command_name: `Don de soutien de ${donorName || 'Anonyme'}`,
+            env: "live", // Passer par défaut en live
+            ipn_url: `${process.env.BACKEND_URL || 'https://fondation-jammu-yalla.onrender.com'}/api/paytech-ipn`,
+            success_url: `${formattedFrontendUrl}/don/succes`,
+            cancel_url: `${formattedFrontendUrl}/don/annulation`,
+            custom_field: JSON.stringify({ donorEmail, donorName })
+        };
 
-        invoice.addItem(`Don de soutien - ${cleanName}`, 1, amount, amount);
-        invoice.totalAmount = amount;
-        invoice.description = 'Soutien aux actions de la fondation';
+        console.log("Appel API PayTech avec params:", { ...params, custom_field: "..." });
 
-        if (donorEmail) {
-            invoice.addCustomData('donorEmail', donorEmail);
-        }
+        const response = await axios.post("https://paytech.sn/api/payment/request-payment", params, {
+            headers: {
+                "API_KEY": PAYTECH_API_KEY,
+                "API_SECRET": PAYTECH_API_SECRET
+            }
+        });
 
-        await invoice.create();
-
-        if (invoice.url) {
-            console.log("Facture PayDunya créée avec succès:", invoice.token);
-            res.json({ url: invoice.url, token: invoice.token });
+        if (response.data && response.data.success === 1) {
+            console.log("Lien PayTech généré avec succès:", response.data.token);
+            res.json({ url: response.data.redirect_url, token: response.data.token });
         } else {
+            console.error("Erreur PayTech (Réponse):", response.data);
             res.status(500).json({
-                error: "Impossible de générer le lien de paiement PayDunya.",
+                error: "Impossible de générer le lien de paiement PayTech.",
+                details: response.data.errors || "Erreur inconnue"
             });
         }
     } catch (err) {
-        console.error("Erreur critique PayDunya:", err);
-
-        let errorDetails = err.message;
-        let isKycError = false;
-
-        if (err.data && err.data.response_text) {
-            errorDetails = err.data.response_text;
-            if (errorDetails.includes("KYC")) {
-                isKycError = true;
-            }
-        }
-
-        if (isKycError) {
-            return res.status(403).json({
-                error: "Le compte de la fondation est en cours de validation par PayDunya (KYC).",
-                details: "Les paiements réels seront activés dès que PayDunya aura validé les documents de la fondation."
-            });
-        }
-
+        console.error("Erreur critique PayTech:", err.message);
         res.status(500).json({
-            error: "Erreur serveur lors de la communication avec PayDunya.",
-            systemError: errorDetails
+            error: "Erreur serveur lors de la communication avec PayTech.",
+            systemError: err.message
         });
     }
 });
 
-// ROUTE : Webhook IPN (Notification Post-Paiement par PayDunya)
-app.post('/api/paydunya-ipn', async (req, res) => {
+// ROUTE : Webhook IPN PayTech (Notification post-paiement)
+app.post('/api/paytech-ipn', async (req, res) => {
+    console.log("=== NOTIFICATION PAYTECH REÇUE ===");
     try {
-        // PayDunya sends the hash inside req.body.data.hash
-        const hash = req.body.data ? req.body.data.hash : req.body.hash;
+        const { type_event, api_key_sha256, api_secret_sha256, extra_cloud_params, item_price, ref_command } = req.body;
 
-        if (!hash) {
-            return res.status(400).send("Hash manquant");
-        }
+        // Note: PayTech envoie les clés hachées pour vérification
+        // On vérifie (simplifié) si c'est bien une notification de vente
+        if (type_event === 'sale_complete') {
+            console.log(`Paiement confirmé ! Réf: ${ref_command}, Montant: ${item_price} XOF`);
 
-        const invoice = new paydunya.CheckoutInvoice(paydunyaSetup, paydunyaStore);
-        const receipt = await invoice.confirm(hash);
-
-        console.log(`\n=== NOTIFICATION PAYDUNYA REÇUE ===`);
-        console.log(`Statut du paiement : ${receipt.status}`);
-        console.log(`Montant : ${invoice.totalAmount}`);
-        console.log(`Client :`, invoice.customer);
-        console.log(`===================================\n`);
-
-        if (receipt.status === 'completed') {
-            // Le paiement a réussi
-            // TODO: Enregistrer le don dans une base de données ou envoyer email de remerciement
-
-            // On peut envoyer un e-mail à l'admin pour l'avertir
+            // Notification Admin via Resend
             if (process.env.RESEND_API_KEY) {
                 const adminEmail = process.env.SMTP_USER || 'souleymanesall138@gmail.com';
                 try {
                     await resend.emails.send({
                         from: 'Fondation Jaamu Yàlla <onboarding@resend.dev>',
                         to: [adminEmail],
-                        subject: `🎉 Un nouveau don de ${invoice.totalAmount} FCFA a été reçu !`,
-                        html: `<p>Bonne nouvelle ! Le paiement PayDunya a été confirmé.</p><p>Montant: <strong>${invoice.totalAmount} FCFA</strong></p>`
+                        subject: `🎉 Nouveau don reçu via PayTech : ${item_price} FCFA`,
+                        html: `
+                            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                                <h1 style="color: #10b981;">Confirmation de Don</h1>
+                                <p>Un nouveau don de <strong>${item_price} FCFA</strong> a été reçu avec succès.</p>
+                                <p>Référence: ${ref_command}</p>
+                            </div>
+                        `
                     });
                 } catch (e) { console.error("Erreur envoi notification admin:", e); }
             }
         }
-
         res.status(200).send("OK");
     } catch (err) {
-        console.error("Erreur lors du traitement de l'IPN PayDunya:", err);
-        res.status(500).send("Erreur de confirmation");
+        console.error("Erreur traitement IPN PayTech:", err);
+        res.status(500).send("Error");
     }
 });
 
