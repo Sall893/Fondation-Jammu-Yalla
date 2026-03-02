@@ -152,7 +152,7 @@ app.post('/api/donate', async (req, res) => {
             currency: "XOF",
             ref_command: `DON_${Date.now()}`,
             command_name: `Don de soutien de ${donorName || 'Anonyme'}`,
-            env: "live", // Passer par défaut en live
+            env: process.env.PAYTECH_ENV || "test", // mode dynamique
             ipn_url: `${process.env.BACKEND_URL || 'https://fondation-jammu-yalla.onrender.com'}/api/paytech-ipn`,
             success_url: `${formattedFrontendUrl}/don/succes`,
             cancel_url: `${formattedFrontendUrl}/don/annulation`,
