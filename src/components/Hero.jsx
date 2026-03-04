@@ -1,28 +1,45 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import heroImg from '../assets/hero-projects.jpg';
+import heroImg1 from '../assets/hero-projects.jpg';
+import heroImg2 from '../assets/femme.jpg';
+
+const images = [heroImg1, heroImg2];
 
 const Hero = () => {
+    const [currentImage, setCurrentImage] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentImage((prev) => (prev === 0 ? 1 : 0));
+        }, 6000);
+        return () => clearInterval(timer);
+    }, []);
+
     return (
         <section className="relative h-screen flex items-center justify-center overflow-hidden">
             {/* Overlay dégradé complexe pour le texte */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-brand-navy via-brand-navy/80 to-transparent z-10"></div>
-            <div className="absolute inset-0 bg-radial-gradient from-transparent to-brand-navy/40 z-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-brand-navy via-brand-navy/80 to-transparent z-10 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-radial-gradient from-transparent to-brand-navy/40 z-10 pointer-events-none"></div>
 
-            {/* Background Image avec animation de zoom lent */}
-            <motion.div
-                initial={{ scale: 1.1 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 10, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
-                className="absolute inset-0"
-            >
-                <img
-                    src={heroImg}
-                    alt="Solidarité"
-                    className="w-full h-full object-cover"
-                />
-            </motion.div>
+            {/* Background Image avec animation de crossfade et zoom lent */}
+            <AnimatePresence>
+                <motion.div
+                    key={currentImage}
+                    initial={{ opacity: 0, scale: 1.05 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 2, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                >
+                    <img
+                        src={images[currentImage]}
+                        alt="Solidarité"
+                        className="w-full h-full object-cover"
+                    />
+                </motion.div>
+            </AnimatePresence>
+
 
             <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white w-full">
                 <div className="max-w-3xl">
