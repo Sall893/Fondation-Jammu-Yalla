@@ -28,6 +28,7 @@ const Navbar = () => {
     { name: 'Nos Programmes', path: '/programmes' },
     { name: 'Actualités', path: '/news' },
     { name: 'Devenir Partenaire', path: '/devenir-partenaire' },
+    { name: 'Contact', path: '/contact' },
   ];
 
   const textColor = isScrolled || !isHome ? 'text-brand-navy' : 'text-white';

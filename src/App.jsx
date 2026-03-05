@@ -14,6 +14,8 @@ import ProgramDetail from './pages/ProgramDetail';
 import Donation from './pages/Donation';
 import DonationSuccess from './pages/DonationSuccess';
 import DonationCancel from './pages/DonationCancel';
+import Contact from './pages/Contact';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 function App() {
     return (
@@ -34,6 +36,8 @@ function App() {
                     <Route path="/don" element={<Donation />} />
                     <Route path="/don/succes" element={<DonationSuccess />} />
                     <Route path="/don/annulation" element={<DonationCancel />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/politique-de-confidentialite" element={<PrivacyPolicy />} />
                 </Routes>
 
                 <Footer />
