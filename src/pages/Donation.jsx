@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { createDonation } from '../api/api';
 
 const Donation = () => {
     const [amount, setAmount] = useState(5000); // Montant par défaut
@@ -8,9 +9,6 @@ const Donation = () => {
     const [donorEmail, setDonorEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-    console.log("DEBUG: Appel API vers", API_BASE_URL);
 
     const handleDonate = async (e) => {
         e.preventDefault();
@@ -26,25 +24,16 @@ const Donation = () => {
         setLoading(true);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/donate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    amount: finalAmount,
-                    donorName,
-                    donorEmail
-                }),
+            const data = await createDonation({
+                amount: finalAmount,
+                donorName,
+                donorEmail
             });
 
-            const data = await response.json();
-
-            if (response.ok && data.url) {
-                // Redirection vers la page de paiement sécurisée PayDunya
+            if (data.url) {
+                // Redirection vers la page de paiement sécurisée
                 window.location.href = data.url;
             } else {
-                // Si le backend renvoie un message spécifique (ex: KYC)
                 setError(data.error || "Erreur de connexion au service de paiement.");
             }
         } catch (err) {

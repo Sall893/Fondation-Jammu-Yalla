@@ -1,8 +1,40 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
+import { submitContactForm } from '../api/api';
 
 const Contact = () => {
+    const [formData, setFormData] = React.useState({
+        name: '',
+        email: '',
+        subject: 'Faire un don',
+        message: ''
+    });
+    const [loading, setLoading] = React.useState(false);
+    const [status, setStatus] = React.useState({ type: '', message: '' });
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setStatus({ type: '', message: '' });
+
+        try {
+            const result = await submitContactForm({
+                name: formData.name,
+                email: formData.email,
+                type: formData.subject,
+                message: formData.message
+            });
+
+            setStatus({ type: 'success', message: result.message || 'Message envoyé avec succès !' });
+            setFormData({ name: '', email: '', subject: 'Faire un don', message: '' });
+        } catch (err) {
+            setStatus({ type: 'error', message: "Impossible d'envoyer le message. Veuillez réessayer." });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="pt-24 bg-white min-h-screen">
             {/* Header / Hero Section */}
@@ -111,12 +143,15 @@ const Contact = () => {
                     >
                         <h2 className="text-3xl font-black text-brand-navy mb-8">Envoyez-nous un message</h2>
 
-                        <form className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Prénom & Nom</label>
                                     <input
                                         type="text"
+                                        required
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                         className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-brand-blue outline-none transition-all text-brand-navy font-bold"
                                         placeholder="Votre nom complet"
                                     />
@@ -125,6 +160,9 @@ const Contact = () => {
                                     <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Email</label>
                                     <input
                                         type="email"
+                                        required
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                         className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-brand-blue outline-none transition-all text-brand-navy font-bold"
                                         placeholder="votre@email.com"
                                     />
@@ -133,7 +171,11 @@ const Contact = () => {
 
                             <div>
                                 <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Sujet</label>
-                                <select className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-brand-blue outline-none transition-all text-brand-navy font-bold appearance-none">
+                                <select
+                                    value={formData.subject}
+                                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                                    className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-brand-blue outline-none transition-all text-brand-navy font-bold appearance-none"
+                                >
                                     <option>Faire un don</option>
                                     <option>Devenir partenaire</option>
                                     <option>Demande d'information</option>
@@ -145,14 +187,33 @@ const Contact = () => {
                                 <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Message</label>
                                 <textarea
                                     rows="5"
+                                    required
+                                    value={formData.message}
+                                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                     className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-brand-blue outline-none transition-all text-brand-navy font-bold resize-none"
                                     placeholder="Comment pouvons-nous vous aider ?"
                                 ></textarea>
                             </div>
 
-                            <button className="w-full bg-brand-navy text-white py-5 rounded-2xl font-black tracking-[0.2em] uppercase flex items-center justify-center gap-3 hover:bg-brand-red transition-all shadow-xl shadow-brand-navy/10 group">
-                                <span>Envoyer le Message</span>
-                                <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                            {status.message && (
+                                <div className={`p - 4 rounded - 2xl font - bold text - center ${status.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'} `}>
+                                    {status.message}
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-brand-navy text-white py-5 rounded-2xl font-black tracking-[0.2em] uppercase flex items-center justify-center gap-3 hover:bg-brand-red transition-all shadow-xl shadow-brand-navy/10 group disabled:opacity-50"
+                            >
+                                {loading ? (
+                                    <span className="animate-pulse">Envoi en cours...</span>
+                                ) : (
+                                    <>
+                                        <span>Envoyer le Message</span>
+                                        <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                    </>
+                                )}
                             </button>
                         </form>
                     </motion.div>

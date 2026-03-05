@@ -11,11 +11,11 @@ const PillarItem = ({ number, title, description, icon, colorClass, delay }) => 
             className="flex flex-col md:flex-row gap-8 md:gap-16 py-16 border-b border-gray-100 last:border-0 group"
         >
             {/* Number & Icon Side */}
-            <div className="flex items-start gap-6 min-w-[300px]">
-                <span className={`text-7xl font-black opacity-10 ${colorClass.replace('bg-', 'text-')} group-hover:opacity-100 transition-opacity duration-700`}>
+            <div className="flex items-start gap-4 md:gap-6 md:min-w-[300px]">
+                <span className={`text-5xl md:text-7xl font-black opacity-10 ${colorClass.replace('bg-', 'text-')} group-hover:opacity-100 transition-opacity duration-700`}>
                     {number}
                 </span>
-                <div className={`mt-4 w-12 h-12 flex items-center justify-center ${colorClass.replace('bg-', 'text-')}`}>
+                <div className={`mt-2 md:mt-4 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center ${colorClass.replace('bg-', 'text-')}`}>
                     {icon}
                 </div>
             </div>

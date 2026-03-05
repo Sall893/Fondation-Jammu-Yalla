@@ -20,3 +20,14 @@ export const submitContactForm = async (formData) => {
     });
     return response.json();
 };
+
+export const createDonation = async (donationData) => {
+    const response = await fetch(`${API_BASE_URL}/donate`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(donationData),
+    });
+    return response.json();
+};
