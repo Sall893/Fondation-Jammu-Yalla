@@ -45,7 +45,8 @@ const Footer = () => {
                                 { name: 'La Fondation', path: '/la-fondation' },
                                 { name: 'Contact', path: '/contact' },
                                 { name: 'Devenir Partenaire', path: '/devenir-partenaire' },
-                                { name: 'Actualités', path: '/news' }
+                                { name: 'Actualités', path: '/news' },
+                                { name: 'Confidentialité', path: '/politique-de-confidentialite' }
                             ].map(link => (
 
                                 <li key={link.name}>
