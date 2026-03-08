@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import news1 from '../assets/1.jpg';
+import news1 from '../assets/ramadan-1.jpg';
 import news2 from '../assets/news-2.jpg';
 import heroNews from '../assets/hero-projects.jpg';
 import transparencyImg from '../assets/transparency.jpg';

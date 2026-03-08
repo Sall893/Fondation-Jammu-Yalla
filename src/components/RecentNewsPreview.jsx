@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import news1 from '../assets/1.jpg';
+import news1 from '../assets/ramadan-1.jpg';
 import news2 from '../assets/program-bayakh.jpg';
 
 const RecentNewsPreview = () => {

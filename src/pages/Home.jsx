@@ -6,6 +6,7 @@ import ProgramsGrid from '../components/ProgramsGrid';
 import Testimonials from '../components/Testimonials';
 import RecentNewsPreview from '../components/RecentNewsPreview';
 import Transparency from '../components/Transparency';
+import RamadanNdogou from '../components/RamadanNdogou';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -19,6 +20,7 @@ const Home = () => {
 
             {/* Chiffres Clés */}
             <KeyFigures />
+            <RamadanNdogou />
 
             <ProgramsGrid />
             <Transparency />
