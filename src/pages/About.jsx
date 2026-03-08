@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import heroAbout from '../assets/hero-about.jpg';
-import expertiseImg from '../assets/2.jpg';
+import expertiseImg from '../assets/powertech.jpg';
 import WolofTestimonials from '../components/WolofTestimonials';
 
 
