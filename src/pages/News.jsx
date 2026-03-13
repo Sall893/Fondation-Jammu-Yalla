@@ -5,6 +5,8 @@ import news2 from '../assets/news-2.jpg';
 import heroNews from '../assets/hero-projects.jpg';
 import transparencyImg from '../assets/transparency.jpg';
 import programBayakh from '../assets/program-bayakh.jpg';
+import ramadan4 from '../assets/ramadan-4.jpg';
+import ramadan5 from '../assets/ramadan-5.jpg';
 
 const News = () => {
     const mainArticle = {
@@ -22,6 +24,20 @@ const News = () => {
             category: "Événement",
             desc: "Comme chaque année, la Fondation Jaamu Yàlla se mobilise pour soutenir les familles démunies durant le mois béni.",
             image: news1
+        },
+        {
+            date: "12 Mars 2026",
+            title: "Action Terrain : Distribution des Kits de Rupture",
+            category: "Impact",
+            desc: "Nos bénévoles sur le terrain distribuent les premiers kits alimentaires.",
+            image: ramadan4
+        },
+        {
+            date: "10 Mars 2026",
+            title: "Préparation Intense au Siège",
+            category: "Engagement",
+            desc: "Mobilisation totale pour le conditionnement des kits Ndogou.",
+            image: ramadan5
         },
         {
             date: "20 Janvier 2026",

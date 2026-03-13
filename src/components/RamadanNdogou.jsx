@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import ramadan1 from '../assets/ramadan-1.jpg';
 import ramadan2 from '../assets/ramadan-2.jpg';
 import ramadan3 from '../assets/ramadan-3.jpg';
+import ramadan4 from '../assets/ramadan-4.jpg';
+import ramadan5 from '../assets/ramadan-5.jpg';
 
 const RamadanNdogou = () => {
     const images = [
@@ -20,6 +22,16 @@ const RamadanNdogou = () => {
             url: ramadan3,
             title: "Sourires et Partage",
             desc: "Un moment de communion et de fraternité."
+        },
+        {
+            url: ramadan4,
+            title: "Préparation des Kits",
+            desc: "Organisation minutieuse pour une distribution efficace."
+        },
+        {
+            url: ramadan5,
+            title: "Équipes sur le Terrain",
+            desc: "Le Groupe PowerTech uni pour la solidarité."
         }
     ];
 
@@ -57,7 +69,7 @@ const RamadanNdogou = () => {
                     </motion.p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {images.map((img, index) => (
                         <motion.div
                             key={index}
