@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import ramadan1 from '../assets/ramadan-1.jpg';
-import ramadan2 from '../assets/ramadan-2.jpg';
-import ramadan3 from '../assets/ramadan-3.jpg';
+import ramadan22 from '../assets/22.jpg';
+import ramadan23 from '../assets/23.jpg';
+import ramadan24 from '../assets/24.jpg';
 import ramadan4 from '../assets/ramadan-4.jpg';
 import ramadan5 from '../assets/ramadan-5.jpg';
 
@@ -14,14 +15,19 @@ const RamadanNdogou = () => {
             desc: "Nos équipes mobilisées pour la préparation des kits."
         },
         {
-            url: ramadan2,
+            url: ramadan22,
             title: "Distribution Solidaire",
             desc: "Partage de repas à travers les quartiers de Dakar."
         },
         {
-            url: ramadan3,
+            url: ramadan23,
             title: "Sourires et Partage",
             desc: "Un moment de communion et de fraternité."
+        },
+        {
+            url: ramadan24,
+            title: "Fraternité",
+            desc: "Le plaisir de partager la rupture du jeûne."
         },
         {
             url: ramadan4,
